@@ -22,7 +22,7 @@ app = FastAPI(
 )
 
 # 1. CORS Configuration
-origins = ["http://localhost:5173", "http://localhost:3000","https://your-axiom-math-site.com"]
+origins = ["http://localhost:5173", "http://localhost:3000","https://axiom-math-ai.vercel.app"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
