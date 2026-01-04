@@ -60,6 +60,17 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const wakeUpBackend = async () => {
+    try {
+      // Just a simple GET request to your health endpoint
+      await fetch("https://axiom-math-ai-2.onrender.com/");
+      console.log("Backend wake-up signal sent.");
+    } catch (e) {
+      console.log("Backend is still sleeping...");
+    }
+  };
+  wakeUpBackend();
+
     scrollToBottom();
   }, [messages, loading, scrollToBottom]);
 
