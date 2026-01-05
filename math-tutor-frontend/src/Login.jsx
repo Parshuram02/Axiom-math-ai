@@ -27,15 +27,12 @@ export default function Login({ onLogin }) {
       { q: "√144 = ?", a: "12", options: ["10", "12", "14"] },
       { q: "Next in sequence: 2, 4, 8, ?", a: "16", options: ["10", "12", "16"] },
       { q: "If f(x) = 2x + 3, what is f(f(1))?", a: "13", options: ["5", "10", "13"] },
-    { q: "Solve for x: log₂(x) = 5", a: "32", options: ["25", "32", "10"] },
-    // Geometry / Trigonometry
-    { q: "In a 3-4-5 triangle, what is sin(θ) for the smallest angle?", a: "0.6", options: ["0.6", "0.8", "1.0"] },
-    { q: "Interior angles of a hexagon sum to?", a: "720° formula is (n-2)*180°", options: ["540°", "720°", "360°"] },
-    // Calculus / Advanced
-    { q: "Derivative of x² at x=3?", a: "6", options: ["3", "6", "9"] },
-    { q: "Limit of 1/x as x → ∞?", a: "0", options: ["1", "0", "∞"] },
-    // Probability
-    { q: "Probability of rolling a prime number on a 6-sided die?", a: "1/2", options: ["1/3", "1/2", "2/3"] }
+      { q: "Solve for x: log₂(x) = 5", a: "32", options: ["25", "32", "10"] },
+      { q: "In a 3-4-5 triangle, what is sin(θ) for the smallest angle?", a: "0.6", options: ["0.6", "0.8", "1.0"] },
+      { q: "Interior angles of a hexagon sum to?", a: "720°", options: ["540°", "720°", "360°"] },
+      { q: "Derivative of x² at x=3?", a: "6", options: ["3", "6", "9"] },
+      { q: "Limit of 1/x as x → ∞?", a: "0", options: ["1", "0", "∞"] },
+      { q: "Probability of rolling a prime number on a 6-sided die?", a: "1/2", options: ["1/3", "1/2", "2/3"] }
     ];
     const picked = challenges[Math.floor(Math.random() * challenges.length)];
     setMathChallenge(picked);
@@ -48,13 +45,9 @@ export default function Login({ onLogin }) {
     setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
   }, []);
 
-  // Real-time check for the Tick Mark
+  // Real-time check for the math challenge
   useEffect(() => {
-    if (userAnswer === mathChallenge.a) {
-      setIsCorrect(true);
-    } else {
-      setIsCorrect(false);
-    }
+    setIsCorrect(userAnswer === mathChallenge.a);
   }, [userAnswer, mathChallenge.a]);
 
   const submit = async (e) => {
@@ -62,28 +55,34 @@ export default function Login({ onLogin }) {
     setLoading(true);
     setError('');
 
-    try {
-      let url, data, headers;
-      if (step === 'register') {
-        const API_URL = import.meta.env.VITE_API_URL;
-        data = { email, password };
-        headers = { 'Content-Type': 'application/json' };
-      } else {
-        const API_URL = import.meta.env.VITE_API_URL;
-        data = `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
-        headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-      }
+    // Fetch API URL from environment variables
+    const API_URL = import.meta.env.VITE_API_URL;
 
-      const response = await axios.post(`${API_URL}/auth/register`, data);
+    try {
       if (step === 'register') {
+        // Register User
+        await axios.post(`${API_URL}/auth/register`, { 
+          email: email, 
+          password: password 
+        });
         setError('Account created! Please sign in.');
         setStep('login');
       } else {
+        // Login User (OAuth2 expects form data for tokens)
+        const params = new URLSearchParams();
+        params.append('username', email);
+        params.append('password', password);
+
+        const response = await axios.post(`${API_URL}/auth/token`, params, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
         localStorage.setItem('token', response.data.access_token);
         onLogin(response.data.access_token);
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Authentication failed.');
+      console.error("Auth Error:", err);
+      setError(err.response?.data?.detail || 'Authentication failed. Please check your connection.');
     } finally {
       setLoading(false);
     }
@@ -108,62 +107,87 @@ export default function Login({ onLogin }) {
           </p>
         </div>
 
-        {error && <div className="error-toast">{error}</div>}
+        {error && <div className={`error-toast ${error.includes('created') ? 'success' : ''}`}>{error}</div>}
 
         <form onSubmit={submit} style={{ marginTop: '10px' }}>
           <div style={{ marginBottom: '15px' }}>
-            <label className="form-group label" style={{ color: '#64748b' }}>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="styled-input" required />
+            <label htmlFor="email" style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', marginBottom: '5px' }}>Email</label>
+            <input 
+              id="email"
+              name="email"
+              type="email" 
+              autoComplete="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              className="styled-input" 
+              placeholder="name@example.com"
+              required 
+            />
           </div>
 
           <div style={{ marginBottom: '15px' }}>
-            <label className="form-group label" style={{ color: '#64748b' }}>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="styled-input" required />
+            <label htmlFor="password" style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', marginBottom: '5px' }}>Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={step === 'login' ? "current-password" : "new-password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} 
+              className="styled-input" 
+              placeholder="••••••••"
+              required 
+            />
           </div>
 
           {/* Tricky Optional Verification */}
           <div className="verify-section" style={{ background: 'rgba(99, 102, 241, 0.05)', padding: '10px', borderRadius: '8px' }}>
-            <button type="button" onClick={() => setShowVerify(!showVerify)} className="logout-link" style={{ color: '#6366f1', fontWeight: 'bold' }}>
+            <button type="button" onClick={() => setShowVerify(!showVerify)} className="logout-link" style={{ color: '#6366f1', fontWeight: 'bold', background: 'none', border: 'none', cursor: 'pointer' }}>
               {showVerify ? "- Close Warmup" : "+ Quick Math IQ (Optional)"}
             </button>
             
             {showVerify && (
               <div style={{ marginTop: '10px' }}>
                 <p style={{ color: '#1e293b', fontSize: '0.9rem', marginBottom: '8px' }}>{mathChallenge.q}</p>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                   {mathChallenge.options.map(opt => (
                     <button
                       key={opt}
                       type="button"
                       onClick={() => setUserAnswer(opt)}
                       style={{
-                        padding: '4px 10px',
-                        borderRadius: '4px',
+                        padding: '4px 12px',
+                        borderRadius: '6px',
                         border: '1px solid #cbd5e1',
                         background: userAnswer === opt ? '#6366f1' : 'white',
                         color: userAnswer === opt ? 'white' : '#1e293b',
                         cursor: 'pointer',
-                        fontSize: '0.8rem'
+                        fontSize: '0.8rem',
+                        transition: 'all 0.2s'
                       }}
                     >
                       {opt}
                     </button>
                   ))}
                   <div style={{ marginLeft: '10px', fontSize: '1.2rem' }}>
-                    {userAnswer && (isCorrect ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ fontSize: '0.7rem', color: '#ef4444' }}>Correct is {mathChallenge.a}</span>)}
+                    {userAnswer && (isCorrect ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ fontSize: '0.7rem', color: '#ef4444' }}>Try again!</span>)}
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          <button type="submit" className="primary-btn" style={{ marginTop: '20px' }}>
-            {loading ? '...' : (step === 'register' ? 'Register' : 'Login')}
+          <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '20px', width: '100%' }}>
+            {loading ? 'Processing...' : (step === 'register' ? 'Register' : 'Login')}
           </button>
         </form>
 
         <div className="footer-toggle" style={{ textAlign: 'center', marginTop: '20px' }}>
-          <button onClick={() => setStep(step === 'login' ? 'register' : 'login')} className="logout-link" style={{ color: '#64748b' }}>
+          <button 
+            onClick={() => { setStep(step === 'login' ? 'register' : 'login'); setError(''); }} 
+            className="logout-link" 
+            style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
             {step === 'login' ? "New here? Create account" : "Back to Login"}
           </button>
         </div>
