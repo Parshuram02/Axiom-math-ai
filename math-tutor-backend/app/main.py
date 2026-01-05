@@ -105,3 +105,6 @@ async def chat(
 @app.get("/health")
 def health():
     return {"status": "ok"}
+@app.get("/")
+def read_root():
+    return {"status": "online", "message": "Axiom Math AI Backend is running!"}
