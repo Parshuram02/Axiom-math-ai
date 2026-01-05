@@ -65,17 +65,16 @@ export default function Login({ onLogin }) {
     try {
       let url, data, headers;
       if (step === 'register') {
-        url = 'http://localhost:8000/auth/register';
+        const API_URL = import.meta.env.VITE_API_URL;
         data = { email, password };
         headers = { 'Content-Type': 'application/json' };
       } else {
-        url = 'http://localhost:8000/auth/token';
+        const API_URL = import.meta.env.VITE_API_URL;
         data = `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
         headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
       }
 
-      const response = await axios.post(url, data, { headers });
-
+      const response = await axios.post(`${API_URL}/auth/register`, data);
       if (step === 'register') {
         setError('Account created! Please sign in.');
         setStep('login');
