@@ -17,6 +17,7 @@ function App() {
   const [difficulty, setDifficulty] = useState('easy');
   const [stats, setStats] = useState({ problems: 0, accuracy: 85 });
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -163,11 +164,16 @@ if (!isLoggedIn) return <Login onLogin={onLoginSuccess} />;  return (
               <span className={`pill-diff ${difficulty}`}>{difficulty.toUpperCase()}</span>
             </div>
             <button onClick={onLogout} className="logout-btn">Logout</button>
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="menu-toggle">
+              {isSidebarOpen ? '✕' : '☰'}
+            </button>
           </div>
         </header>
 
+        <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+
         <div className="app-body">
-          <aside className="app-sidebar">
+          <aside className={`app-sidebar ${isSidebarOpen ? 'open' : ''}`}>
             <div className="side-card">
               <h3>Preferences</h3>
               <div className="form-group">

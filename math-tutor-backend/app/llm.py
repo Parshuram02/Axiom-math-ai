@@ -111,7 +111,7 @@ def call_openai_vision_logic(message, image, topic, difficulty, history):
         model="openai/gpt-4o-mini", 
         messages=messages,
         temperature=0.3,
-        max_tokens=1000,
+        max_tokens=400,
     )
 
     text = response.choices[0].message.content.strip()
@@ -139,7 +139,7 @@ def call_openai(req: ChatRequest) -> ChatResponse:
         model="openai/gpt-4o-mini",
         messages=messages,
         temperature=0.3,
-        max_tokens=800,
+        max_tokens=400,
     )
 
     text = response.choices[0].message.content.strip()

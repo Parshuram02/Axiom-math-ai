@@ -99,19 +99,19 @@ export default function Login({ onLogin }) {
       <div className="login-card">
         <div style={{ textAlign: 'center' }}>
           <div className="logo-icon-large">Σ</div>
-          <h2 style={{ color: '#1e293b', fontSize: '24px', margin: '10px 0 5px' }}>
+          <h2>
             {step === 'register' ? 'Create Account' : 'Axiom Math AI'}
           </h2>
-          <p style={{ fontSize: '0.8rem', fontStyle: 'italic', color: '#64748b', marginBottom: '15px' }}>
+          <p>
             {quote}
           </p>
         </div>
 
         {error && <div className={`error-toast ${error.includes('created') ? 'success' : ''}`}>{error}</div>}
 
-        <form onSubmit={submit} style={{ marginTop: '10px' }}>
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="email" style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', marginBottom: '5px' }}>Email</label>
+        <form onSubmit={submit}>
+          <div style={{ marginBottom: '16px' }}>
+            <label htmlFor="email" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '6px', fontWeight: '500' }}>Email</label>
             <input 
               id="email"
               name="email"
@@ -125,8 +125,8 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="password" style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', marginBottom: '5px' }}>Password</label>
+          <div style={{ marginBottom: '16px' }}>
+            <label htmlFor="password" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '6px', fontWeight: '500' }}>Password</label>
             <input
               id="password"
               name="password"
@@ -141,14 +141,14 @@ export default function Login({ onLogin }) {
           </div>
 
           {/* Tricky Optional Verification */}
-          <div className="verify-section" style={{ background: 'rgba(99, 102, 241, 0.05)', padding: '10px', borderRadius: '8px' }}>
-            <button type="button" onClick={() => setShowVerify(!showVerify)} className="logout-link" style={{ color: '#6366f1', fontWeight: 'bold', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <div className="verify-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', marginTop: '16px', border: '1px solid #e2e8f0' }}>
+            <button type="button" onClick={() => setShowVerify(!showVerify)} style={{ color: '#2563eb', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>
               {showVerify ? "- Close Warmup" : "+ Quick Math IQ (Optional)"}
             </button>
             
             {showVerify && (
-              <div style={{ marginTop: '10px' }}>
-                <p style={{ color: '#1e293b', fontSize: '0.9rem', marginBottom: '8px' }}>{mathChallenge.q}</p>
+              <div style={{ marginTop: '12px' }}>
+                <p style={{ color: '#0f172a', fontSize: '0.95rem', marginBottom: '8px', fontWeight: '500' }}>{mathChallenge.q}</p>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                   {mathChallenge.options.map(opt => (
                     <button
@@ -177,16 +177,14 @@ export default function Login({ onLogin }) {
             )}
           </div>
 
-          <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '20px', width: '100%' }}>
+          <button type="submit" className="primary-btn" disabled={loading}>
             {loading ? 'Processing...' : (step === 'register' ? 'Register' : 'Login')}
           </button>
         </form>
 
-        <div className="footer-toggle" style={{ textAlign: 'center', marginTop: '20px' }}>
+        <div className="footer-toggle">
           <button 
             onClick={() => { setStep(step === 'login' ? 'register' : 'login'); setError(''); }} 
-            className="logout-link" 
-            style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             {step === 'login' ? "New here? Create account" : "Back to Login"}
           </button>
